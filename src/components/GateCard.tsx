@@ -45,10 +45,10 @@ export function GateCard({ gate, onToggle }: GateCardProps) {
               {gate.isOpen ? (
                 <Unlock className="h-4 w-4 text-green-500" />
               ) : (
-                <Lock className="h-4 w-4 text-red-500" />
+                <Lock className="h-4 w-4 text-black-500" />
               )}
               <span className="text-sm">Status:</span>
-              <p className={`text-sm font-medium ${gate.isOpen ? 'text-green-600' : 'text-red-600'
+              <p className={`text-sm font-medium ${gate.isOpen ? 'text-green-600' : 'text-black-600'
                 }`}>
                 {gate.isOpen ? 'Aberta' : 'Fechada'}
               </p>
