@@ -22,3 +22,45 @@ export type ConnectionStatus =
   | "disconnected"
   | "warning"
   | "maintenance";
+
+// User related interfaces
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  cpf: string;
+  phone: string;
+  birthDate: string;
+  address: {
+    street: string;
+    cep: string;
+    city: string;
+    state: string;
+    neighborhood: string;
+    complement?: string;
+  };
+  createdAt: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  cpf: string;
+  phone: string;
+  birthDate: string;
+  password: string;
+  confirmPassword: string;
+  address: {
+    street: string;
+    cep: string;
+    city: string;
+    state: string;
+    neighborhood: string;
+    complement?: string;
+  };
+}
+
+export interface LoginData {
+  email: string;
+  password: string;
+}
