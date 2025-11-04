@@ -88,7 +88,7 @@ export function RegisterForm({ onRegister, onSwitchToLogin, isLoading = false }:
               <h3 className="font-medium text-foreground">Dados Pessoais</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="name">Nome Completo</Label>
                   <Input
                     id="name"
@@ -165,7 +165,7 @@ export function RegisterForm({ onRegister, onSwitchToLogin, isLoading = false }:
                   )}
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2">
                   <Label htmlFor="birthDate">Data de Nascimento</Label>
                   <Input
                     id="birthDate"
