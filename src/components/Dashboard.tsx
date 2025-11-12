@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ParkingLotList } from './ParkingLotList';
 import { ParkingLotDetail } from './ParkingLotDetail';
+import { UsersList } from './UsersList';
 import { Button } from './ui/button';
 import { mockParkingLots, mockGates } from '../data/mockData';
 import { ParkingLot, Gate } from '../types';
-import { Car, Menu, X, LogOut, User } from 'lucide-react';
+import { Car, Menu, X, LogOut, User, Users, Building2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import {
   DropdownMenu,
@@ -14,6 +15,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 export function Dashboard() {
   const { user, logout } = useAuth();
@@ -21,12 +24,13 @@ export function Dashboard() {
   const [gates, setGates] = useState<Record<string, Gate[]>>(mockGates);
   const [selectedParkingLotId, setSelectedParkingLotId] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('estacionamentos');
 
-  const selectedParkingLot = selectedParkingLotId 
+  const selectedParkingLot = selectedParkingLotId
     ? parkingLots.find(lot => lot.id === selectedParkingLotId)
     : null;
-  
-  const selectedGates = selectedParkingLotId 
+
+  const selectedGates = selectedParkingLotId
     ? gates[selectedParkingLotId] || []
     : [];
 
@@ -39,13 +43,18 @@ export function Dashboard() {
     setSelectedParkingLotId(null);
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSelectedParkingLotId(null);
+  };
+
   const handleToggleGate = (gateId: string) => {
     if (!selectedParkingLotId) return;
 
     setGates(prevGates => ({
       ...prevGates,
       [selectedParkingLotId]: prevGates[selectedParkingLotId].map(gate =>
-        gate.id === gateId 
+        gate.id === gateId
           ? { ...gate, isOpen: !gate.isOpen, lastActivity: new Date().toISOString() }
           : gate
       )
@@ -85,6 +94,26 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Floating Action Button - Only show on parking lots tab */}
+      {activeTab === 'estacionamentos' && !selectedParkingLotId && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => setActiveTab('usuarios')}
+                className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all z-50 md:hidden"
+                size="icon"
+              >
+                <Users className="h-6 w-6" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <p>Gerenciar Usuários</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+
       {/* Header */}
       <header className="bg-white border-b border-border sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
@@ -123,6 +152,16 @@ export function Dashboard() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSelectedParkingLotId(null);
+                      setActiveTab('usuarios');
+                    }}
+                    className="gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    Gerenciar Usuários
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="gap-2">
                     <LogOut className="h-4 w-4" />
                     Sair
@@ -171,19 +210,38 @@ export function Dashboard() {
             onRefresh={handleRefresh}
           />
         ) : (
-          <div className="space-y-6">
-            <div className="text-center md:text-left">
-              <h2 className="text-3xl font-semibold">Estacionamentos</h2>
-              <p className="text-muted-foreground mt-1">
-                Gerencie e monitore todos os seus estacionamentos em tempo real
-              </p>
-            </div>
-            
-            <ParkingLotList
-              parkingLots={parkingLots}
-              onSelectParkingLot={handleSelectParkingLot}
-            />
-          </div>
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="mb-6">
+              <TabsTrigger value="estacionamentos" className="gap-2">
+                <Building2 className="h-4 w-4" />
+                Estacionamentos
+              </TabsTrigger>
+              <TabsTrigger value="usuarios" className="gap-2">
+                <Users className="h-4 w-4" />
+                Usuários
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="estacionamentos">
+              <div className="space-y-6">
+                <div className="text-center md:text-left">
+                  <h2 className="text-3xl">Estacionamentos</h2>
+                  <p className="text-muted-foreground mt-1">
+                    Gerencie e monitore todos os seus estacionamentos em tempo real
+                  </p>
+                </div>
+
+                <ParkingLotList
+                  parkingLots={parkingLots}
+                  onSelectParkingLot={handleSelectParkingLot}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="usuarios">
+              <UsersList />
+            </TabsContent>
+          </Tabs>
         )}
       </main>
     </div>
