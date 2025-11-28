@@ -1,42 +1,46 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { AuthProvider, useAuth } from '../hooks/useAuth';
-import { LoginForm } from '../components/LoginForm';
-import { RegisterForm } from '../components/RegisterForm';
-import { Dashboard } from '../components/Dashboard';
-import { Toaster } from '../components/ui/sonner';
-import { LoginData, RegisterData } from '../types';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { AuthProvider, useAuth } from "../hooks/useAuth";
+import { LoginForm } from "../components/LoginForm";
+import { RegisterForm } from "../components/RegisterForm";
+import { Dashboard } from "../components/Dashboard";
+import { Toaster } from "../components/ui/sonner";
+import { AuthenticateLoginData, RegisterData } from "../types";
+import { toast } from "sonner";
 
 function AuthenticatedApp() {
   const { isAuthenticated, login, register, isLoading } = useAuth();
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
-  const handleLogin = async (data: LoginData) => {
+  const handleLogin = async (data: AuthenticateLoginData) => {
     try {
       await login(data);
-      toast.success('Login realizado com sucesso!');
+      toast.success("Login realizado com sucesso!");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Erro ao fazer login');
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao fazer login"
+      );
     }
   };
 
   const handleRegister = async (data: RegisterData) => {
     try {
       await register(data);
-      toast.success('Conta criada com sucesso!');
+      toast.success("Conta criada com sucesso!");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Erro ao criar conta');
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar conta"
+      );
     }
   };
 
   const handleSwitchToLogin = () => {
-    setAuthMode('login');
+    setAuthMode("login");
   };
 
   const handleSwitchToRegister = () => {
-    setAuthMode('register');
+    setAuthMode("register");
   };
 
   if (isAuthenticated) {
@@ -45,7 +49,7 @@ function AuthenticatedApp() {
 
   return (
     <>
-      {authMode === 'login' ? (
+      {authMode === "login" ? (
         <LoginForm
           onLogin={handleLogin}
           onSwitchToRegister={handleSwitchToRegister}

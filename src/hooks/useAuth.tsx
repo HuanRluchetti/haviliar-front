@@ -1,10 +1,14 @@
 import React from "react";
-import { User, RegisterData, LoginData } from "../types";
+import cookies from "js-cookie";
+import { registerUser } from "@/services/user/register";
+import { authenticate } from "@/services/auth/authenticate";
+
+import { User, RegisterData, AuthenticateLoginData } from "../types";
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (data: LoginData) => Promise<void>;
+  login: (data: AuthenticateLoginData) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -15,50 +19,46 @@ const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isLogged, setIsLogged] = React.useState(false);
 
-  // Verificar se há usuário logado no localStorage ao inicializar
   React.useEffect(() => {
-    const savedUser = localStorage.getItem("parkcontrol_user");
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        localStorage.removeItem("parkcontrol_user");
-      }
+    const token = cookies.get("token");
+
+    if (token) {
+      setIsLogged(true);
     }
   }, []);
 
-  const login = async (data: LoginData) => {
+  const login = async (data: AuthenticateLoginData) => {
     setIsLoading(true);
 
     try {
-      // Simular chamada de API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Verificar credenciais (mock)
-      const savedUsers = JSON.parse(
-        localStorage.getItem("parkcontrol_users") || "[]"
-      );
-      const existingUser = savedUsers.find((u: User) => u.email === data.email);
-
-      if (!existingUser) {
-        throw new Error("Usuário não encontrado");
-      }
-
-      // Em um cenário real, verificaria a senha hasheada
-      const savedPassword = localStorage.getItem(
-        `parkcontrol_password_${existingUser.id}`
-      );
-      if (savedPassword !== data.password) {
-        throw new Error("Senha incorreta");
-      }
-
-      setUser(existingUser);
-      localStorage.setItem("parkcontrol_user", JSON.stringify(existingUser));
+      await authenticate(data);
     } catch (error) {
       throw error;
     } finally {
+      // const logedUser: User = {
+      //   email: data.email,
+      //   document: "0",
+      //   userAddressRequest: {
+      //     city: "0",
+      //     state: "0",
+      //     neighborhood: "0",
+      //     zipCode: "0",
+      //     street: "0",
+      //     number: "0",
+      //     complement: "0",
+      //   },
+      //   phone: "0".replace(/\D/g, ""),
+      //   userName: data.email,
+      //   password: data.senha,
+      //   dateOfBirth: "0",
+      //   userType: "Admin",
+      // };
+
+      // setUser(logedUser);
       setIsLoading(false);
+      setIsLogged(true);
     }
   };
 
@@ -66,45 +66,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
 
     try {
-      // Simular chamada de API
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const requiredFields: (keyof RegisterData)[] = [
+        "name",
+        "email",
+        "password",
+        "cpf",
+        "phone",
+        "birthDate",
+        "confirmPassword",
+        "address",
+      ];
 
-      // Verificar se email já existe
-      const savedUsers = JSON.parse(
-        localStorage.getItem("parkcontrol_users") || "[]"
-      );
-      const emailExists = savedUsers.some((u: User) => u.email === data.email);
+      const todosPreenchidos = requiredFields.every((key) => {
+        const value = data[key];
+        return typeof value === "string" && value.trim().length > 0;
+      });
 
-      if (emailExists) {
-        throw new Error("E-mail já está em uso");
+      if (todosPreenchidos) {
+        throw new Error("Por favor, preencha todos os campos.");
       }
 
-      // Verificar se CPF já existe
-      const cpfExists = savedUsers.some((u: User) => u.cpf === data.cpf);
-
-      if (cpfExists) {
-        throw new Error("CPF já está cadastrado");
-      }
-
-      // Criar novo usuário
       const newUser: User = {
-        id: Date.now().toString(),
-        name: data.name,
         email: data.email,
-        cpf: data.cpf,
-        phone: data.phone,
-        birthDate: data.birthDate,
-        address: data.address,
-        createdAt: new Date().toISOString(),
+        document: data.cpf,
+        userAddressRequest: {
+          city: data.address.city,
+          state: data.address.state,
+          neighborhood: data.address.neighborhood,
+          zipCode: data.address.cep,
+          street: data.address.street,
+          number: "0",
+          complement: data.address.complement,
+        },
+        phone: data.phone.replace(/\D/g, ""),
+        userName: data.name,
+        password: data.password,
+        dateOfBirth: data.birthDate,
+        userType: "Admin",
       };
 
-      // Salvar usuário
-      const updatedUsers = [...savedUsers, newUser];
-      localStorage.setItem("parkcontrol_users", JSON.stringify(updatedUsers));
-      localStorage.setItem(`parkcontrol_password_${newUser.id}`, data.password);
-
-      setUser(newUser);
-      localStorage.setItem("parkcontrol_user", JSON.stringify(newUser));
+      await registerUser(newUser);
     } catch (error) {
       throw error;
     } finally {
@@ -119,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     user,
-    isAuthenticated: !!user,
+    isAuthenticated: isLogged,
     login,
     register,
     logout,
@@ -134,5 +135,6 @@ export function useAuth() {
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
 }

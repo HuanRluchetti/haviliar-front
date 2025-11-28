@@ -25,21 +25,22 @@ export type ConnectionStatus =
 
 // User related interfaces
 export interface User {
-  id: string;
-  name: string;
   email: string;
-  cpf: string;
-  phone: string;
-  birthDate: string;
-  address: {
-    street: string;
-    cep: string;
+  document: string;
+  userAddressRequest: {
     city: string;
     state: string;
     neighborhood: string;
+    zipCode: string;
+    street: string;
+    number: string;
     complement?: string;
   };
-  createdAt: string;
+  phone: string;
+  userName: string;
+  password: string;
+  dateOfBirth: string; // formato yyyy-MM-dd
+  userType: "Admin" | "User" | string; // ou ajustar conforme enum real
 }
 
 export interface RegisterData {
@@ -60,7 +61,7 @@ export interface RegisterData {
   };
 }
 
-export interface LoginData {
+export type AuthenticateLoginData = {
   email: string;
-  password: string;
-}
+  senha: string;
+};

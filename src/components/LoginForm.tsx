@@ -4,11 +4,11 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { LoginData } from '../types';
+import { AuthenticateLoginData } from '../types';
 import { Eye, EyeOff, Car } from 'lucide-react';
 
 interface LoginFormProps {
-  onLogin: (data: LoginData) => void;
+  onLogin: (data: AuthenticateLoginData) => void;
   onSwitchToRegister: () => void;
   isLoading?: boolean;
 }
@@ -20,9 +20,9 @@ export function LoginForm({ onLogin, onSwitchToRegister, isLoading = false }: Lo
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm<LoginData>();
+  } = useForm<AuthenticateLoginData>();
 
-  const onSubmit = (data: LoginData) => {
+  const onSubmit = (data: AuthenticateLoginData) => {
     onLogin(data);
   };
 
@@ -35,7 +35,7 @@ export function LoginForm({ onLogin, onSwitchToRegister, isLoading = false }: Lo
               <Car className="h-8 w-8" />
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">ParkControl</CardTitle>
+          <CardTitle className="text-2xl text-center">Haviliar</CardTitle>
           <CardDescription className="text-center">
             Entre com suas credenciais para acessar o sistema
           </CardDescription>
@@ -43,17 +43,17 @@ export function LoginForm({ onLogin, onSwitchToRegister, isLoading = false }: Lo
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="text">Nome de Usuário</Label>
               <Input
                 id="email"
-                type="email"
-                placeholder="seu@email.com"
+                type="text"
+                placeholder="Nome de Usuário"
                 {...register('email', { 
-                  required: 'E-mail é obrigatório',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'E-mail inválido'
-                  }
+                  required: 'Nome de Usuário é obrigatório',
+                  // pattern: {
+                  //   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  //   message: 'Nome de Usuário inválido'
+                  // }
                 })}
               />
               {errors.email && (
@@ -66,9 +66,9 @@ export function LoginForm({ onLogin, onSwitchToRegister, isLoading = false }: Lo
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? "text" : "senha"}
                   placeholder="Digite sua senha"
-                  {...register('password', { 
+                  {...register('senha', { 
                     required: 'Senha é obrigatória'
                   })}
                 />
@@ -86,8 +86,8 @@ export function LoginForm({ onLogin, onSwitchToRegister, isLoading = false }: Lo
                   )}
                 </Button>
               </div>
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
+              {errors.senha && (
+                <p className="text-sm text-destructive">{errors.senha.message}</p>
               )}
             </div>
 
@@ -97,13 +97,13 @@ export function LoginForm({ onLogin, onSwitchToRegister, isLoading = false }: Lo
               </Button>
               
               <div className="text-center space-y-2">
-                <Button
+                {/* <Button
                   type="button"
                   variant="link"
                   className="text-sm text-muted-foreground"
                 >
                   Esqueci minha senha
-                </Button>
+                </Button> */}
                 
                 <div className="text-sm text-muted-foreground">
                   Não tem uma conta?{' '}
