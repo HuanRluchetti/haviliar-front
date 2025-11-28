@@ -8,6 +8,23 @@ export interface ParkingLot {
   lastUpdate: string;
 }
 
+export interface Centers {
+  name: string;
+  isActive: string;
+}
+
+export interface CenterItem {
+  operationCenterId: number;
+  name: string;
+  isActive: boolean;
+}
+
+export interface CenterResponse {
+  pageIndex: number;
+  totalItems: number;
+  items: CenterItem[];
+}
+
 export interface Gate {
   id: string;
   name: string;
@@ -64,4 +81,9 @@ export interface RegisterData {
 export type AuthenticateLoginData = {
   email: string;
   senha: string;
+};
+
+export type Action = {
+  serial: string;
+  action: string;
 };

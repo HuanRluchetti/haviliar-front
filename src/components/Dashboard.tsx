@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { ParkingLotList } from './ParkingLotList';
-import { ParkingLotDetail } from './ParkingLotDetail';
-import { UsersList } from './UsersList';
-import { Button } from './ui/button';
-import { mockParkingLots, mockGates } from '../data/mockData';
-import { ParkingLot, Gate } from '../types';
-import { Car, Menu, X, LogOut, User, Users, Building2 } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import React, { useState, useEffect } from "react";
+import { ParkingLotList } from "./ParkingLotList";
+import { ParkingLotDetail } from "./ParkingLotDetail";
+import { UsersList } from "./UsersList";
+import { Button } from "./ui/button";
+import { parkingList, mockGates } from "../data/mockData";
+import { ParkingLot, Gate } from "../types";
+import { Car, Menu, X, LogOut, User, Users, Building2 } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,20 +14,35 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+} from "./ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 export function Dashboard() {
   const { user, logout } = useAuth();
-  const [parkingLots, setParkingLots] = useState<ParkingLot[]>(mockParkingLots);
+  const [parkingLots, setParkingLots] = useState<ParkingLot[]>([]);
   const [gates, setGates] = useState<Record<string, Gate[]>>(mockGates);
-  const [selectedParkingLotId, setSelectedParkingLotId] = useState<string | null>(null);
+  const [selectedParkingLotId, setSelectedParkingLotId] = useState<
+    string | null
+  >(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>('estacionamentos');
+  const [activeTab, setActiveTab] = useState<string>("estacionamentos");
+
+  if (!parkingLots) {
+    setParkingLots(parkingList);
+  }
+
+  useEffect(() => {
+    setParkingLots(parkingList);
+  }, [parkingList]);
 
   const selectedParkingLot = selectedParkingLotId
-    ? parkingLots.find(lot => lot.id === selectedParkingLotId)
+    ? parkingLots.find((lot) => lot.id === selectedParkingLotId)
     : null;
 
   const selectedGates = selectedParkingLotId
@@ -51,21 +66,25 @@ export function Dashboard() {
   const handleToggleGate = (gateId: string) => {
     if (!selectedParkingLotId) return;
 
-    setGates(prevGates => ({
+    setGates((prevGates) => ({
       ...prevGates,
-      [selectedParkingLotId]: prevGates[selectedParkingLotId].map(gate =>
+      [selectedParkingLotId]: prevGates[selectedParkingLotId].map((gate) =>
         gate.id === gateId
-          ? { ...gate, isOpen: !gate.isOpen, lastActivity: new Date().toISOString() }
+          ? {
+              ...gate,
+              isOpen: !gate.isOpen,
+              lastActivity: new Date().toISOString(),
+            }
           : gate
-      )
+      ),
     }));
   };
 
   const handleRefresh = () => {
     // Simulate refresh by updating last update time
     if (selectedParkingLotId) {
-      setParkingLots(prevLots =>
-        prevLots.map(lot =>
+      setParkingLots((prevLots) =>
+        prevLots.map((lot) =>
           lot.id === selectedParkingLotId
             ? { ...lot, lastUpdate: new Date().toISOString() }
             : lot
@@ -81,10 +100,10 @@ export function Dashboard() {
   // Auto-refresh every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setParkingLots(prevLots =>
-        prevLots.map(lot => ({
+      setParkingLots((prevLots) =>
+        prevLots.map((lot) => ({
           ...lot,
-          lastUpdate: new Date().toISOString()
+          lastUpdate: new Date().toISOString(),
         }))
       );
     }, 30000);
@@ -95,12 +114,12 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Floating Action Button - Only show on parking lots tab */}
-      {activeTab === 'estacionamentos' && !selectedParkingLotId && (
+      {activeTab === "estacionamentos" && !selectedParkingLotId && (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                onClick={() => setActiveTab('usuarios')}
+                onClick={() => setActiveTab("usuarios")}
                 className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all z-50 md:hidden"
                 size="icon"
               >
@@ -125,7 +144,9 @@ export function Dashboard() {
                 </div>
                 <div>
                   <h1 className="text-xl font-semibold">ParkControl</h1>
-                  <p className="text-sm text-muted-foreground">Sistema de Controle de Cancelas</p>
+                  <p className="text-sm text-muted-foreground">
+                    Sistema de Controle de Cancelas
+                  </p>
                 </div>
               </div>
             </div>
@@ -138,7 +159,11 @@ export function Dashboard() {
                 className="md:hidden"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
-                {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+                {isMobileMenuOpen ? (
+                  <X className="h-4 w-4" />
+                ) : (
+                  <Menu className="h-4 w-4" />
+                )}
               </Button>
 
               {/* User menu */}
@@ -146,7 +171,7 @@ export function Dashboard() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
                     <User className="h-4 w-4" />
-                    <span className="hidden md:inline">{user?.name}</span>
+                    <span className="hidden md:inline">{user?.userName}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -155,7 +180,7 @@ export function Dashboard() {
                   <DropdownMenuItem
                     onClick={() => {
                       setSelectedParkingLotId(null);
-                      setActiveTab('usuarios');
+                      setActiveTab("usuarios");
                     }}
                     className="gap-2"
                   >
@@ -176,7 +201,11 @@ export function Dashboard() {
                 <div className="text-right">
                   <p className="font-medium">{selectedParkingLot.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {selectedGates.filter(g => g.status === 'connected').length}/{selectedGates.length} cancelas conectadas
+                    {
+                      selectedGates.filter((g) => g.status === "connected")
+                        .length
+                    }
+                    /{selectedGates.length} cancelas conectadas
                   </p>
                 </div>
               )}
@@ -190,7 +219,11 @@ export function Dashboard() {
                 <div className="mb-4">
                   <p className="font-medium">{selectedParkingLot.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {selectedGates.filter(g => g.status === 'connected').length}/{selectedGates.length} cancelas conectadas
+                    {
+                      selectedGates.filter((g) => g.status === "connected")
+                        .length
+                    }
+                    /{selectedGates.length} cancelas conectadas
                   </p>
                 </div>
               )}
@@ -210,7 +243,11 @@ export function Dashboard() {
             onRefresh={handleRefresh}
           />
         ) : (
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={handleTabChange}
+            className="w-full"
+          >
             <TabsList className="mb-6">
               <TabsTrigger value="estacionamentos" className="gap-2">
                 <Building2 className="h-4 w-4" />
@@ -227,7 +264,8 @@ export function Dashboard() {
                 <div className="text-center md:text-left">
                   <h2 className="text-3xl">Estacionamentos</h2>
                   <p className="text-muted-foreground mt-1">
-                    Gerencie e monitore todos os seus estacionamentos em tempo real
+                    Gerencie e monitore todos os seus estacionamentos em tempo
+                    real
                   </p>
                 </div>
 

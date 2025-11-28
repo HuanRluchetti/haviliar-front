@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { AuthProvider, useAuth } from "../hooks/useAuth";
-import { LoginForm } from "../components/LoginForm";
-import { RegisterForm } from "../components/RegisterForm";
-import { Dashboard } from "../components/Dashboard";
-import { Toaster } from "../components/ui/sonner";
-import { AuthenticateLoginData, RegisterData } from "../types";
 import { toast } from "sonner";
+import React, { useState } from "react";
+import { Toaster } from "../components/ui/sonner";
+import { LoginForm } from "../components/LoginForm";
+import { Dashboard } from "../components/Dashboard";
+import { AuthProvider, useAuth } from "../hooks/useAuth";
+import { RegisterForm } from "../components/RegisterForm";
+import { AuthenticateLoginData, RegisterData } from "../types";
 
 function AuthenticatedApp() {
   const { isAuthenticated, login, register, isLoading } = useAuth();

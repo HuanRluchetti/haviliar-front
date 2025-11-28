@@ -3,6 +3,7 @@ import { StatusBadge } from "./StatusBadge";
 import { Button } from "./ui/button";
 import { Gate } from "../types";
 import { Lock, Unlock, Battery, Clock, Settings } from "lucide-react";
+import { postAction } from "@/services/action/posAction";
 
 interface GateCardProps {
   gate: Gate;
@@ -12,25 +13,34 @@ interface GateCardProps {
 export function GateCard({ gate, onToggle }: GateCardProps) {
   const formatLastActivity = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString('pt-BR');
+    return date.toLocaleString("pt-BR");
   };
 
   const getBatteryColor = (level?: number) => {
-    if (!level) return 'text-gray-400';
-    if (level > 50) return 'text-green-500';
-    if (level > 20) return 'text-yellow-500';
-    return 'text-red-500';
+    if (!level) return "text-gray-400";
+    if (level > 50) return "text-green-500";
+    if (level > 20) return "text-yellow-500";
+    return "text-red-500";
   };
 
-  const isOperational = gate.status === 'connected';
+  const isOperational = gate.status === "connected";
+
+  const handleGateAction = async () => {
+    if (!isOperational) return;
+
+    postAction();
+  };
 
   return (
-    <Card className={`transition-all duration-200 ${gate.status === 'connected'
-      ? 'hover:shadow-md'
-      : gate.status === 'disconnected'
-        ? 'opacity-75 bg-gray-50'
-        : 'border-blue-200 bg-blue-50'
-      }`}>
+    <Card
+      className={`transition-all duration-200 ${
+        gate.status === "connected"
+          ? "hover:shadow-md"
+          : gate.status === "disconnected"
+          ? "opacity-75 bg-gray-50"
+          : "border-blue-200 bg-blue-50"
+      }`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <CardTitle className="text-base">{gate.name}</CardTitle>
@@ -48,19 +58,23 @@ export function GateCard({ gate, onToggle }: GateCardProps) {
                 <Lock className="h-4 w-4 text-black-500" />
               )}
               <span className="text-sm">Status:</span>
-              <p className={`text-sm font-medium ${gate.isOpen ? 'text-green-600' : 'text-black-600'
-                }`}>
-                {gate.isOpen ? 'Aberta' : 'Fechada'}
+              <p
+                className={`text-sm font-medium ${
+                  gate.isOpen ? "text-green-600" : "text-black-600"
+                }`}
+              >
+                {gate.isOpen ? "Aberta" : "Fechada"}
               </p>
             </div>
-
           </div>
         </div>
 
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Última atividade</span>
+            <span className="text-sm text-muted-foreground">
+              Última atividade
+            </span>
           </div>
           <p className="text-sm text-muted-foreground">
             {formatLastActivity(gate.lastActivity)}
@@ -69,7 +83,7 @@ export function GateCard({ gate, onToggle }: GateCardProps) {
 
         <div className="flex gap-2 pt-2">
           <Button
-            onClick={() => onToggle(gate.id)}
+            onClick={handleGateAction}
             disabled={!isOperational}
             variant={gate.isOpen ? "destructive" : "default"}
             className="flex-1"
@@ -88,22 +102,18 @@ export function GateCard({ gate, onToggle }: GateCardProps) {
             )}
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={!isOperational}
-          >
+          <Button variant="outline" size="sm" disabled={!isOperational}>
             <Settings className="h-4 w-4" />
           </Button>
         </div>
 
-        {gate.status === 'maintenance' && (
+        {gate.status === "maintenance" && (
           <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded border border-blue-200">
             Esta cancela está em modo de manutenção
           </div>
         )}
 
-        {gate.status === 'disconnected' && (
+        {gate.status === "disconnected" && (
           <div className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">
             Sem conexão com a cancela
           </div>

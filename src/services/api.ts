@@ -25,6 +25,7 @@ if (token) {
 api.interceptors.request.use((config) => {
   const token = cookies.get("token");
   const endpoint = config.url ?? "";
+  console.log(api.getUri);
 
   config.headers.Authorization = `Bearer ${token}`;
 
@@ -32,10 +33,10 @@ api.interceptors.request.use((config) => {
     return config;
   }
 
-  if (!token) {
-    Router.push("/auth/login");
-    throw new axios.Cancel("Token inexistente. Redirecionando para login.");
-  }
+  // if (!token) {
+  //   Router.push("/auth/login");
+  //   throw new axios.Cancel("Token inexistente. Redirecionando para login.");
+  // }
 
   return config;
 });
@@ -43,11 +44,11 @@ api.interceptors.request.use((config) => {
 function handleApiError(error: any) {
   const { status, data } = error.response ?? {};
 
-  if (status === 401) {
-    cookies.remove("token");
-    Router.push("/auth/login");
-    return Promise.reject(error);
-  }
+  // if (status === 401) {
+  //   cookies.remove("token");
+  //   Router.push("/auth/login");
+  //   return Promise.reject(error);
+  // }
 
   if (status === 400 && data?.errors) {
     error.message = getApiResponseErrors(data.errors);

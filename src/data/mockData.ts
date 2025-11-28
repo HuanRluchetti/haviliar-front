@@ -1,4 +1,5 @@
-import { ParkingLot, Gate } from "../types";
+import { ParkingLot, Gate, CenterResponse } from "../types";
+import { getCenter } from "@/services/centers/getCenter";
 
 export const mockParkingLots: ParkingLot[] = [
   {
@@ -38,6 +39,32 @@ export const mockParkingLots: ParkingLot[] = [
     lastUpdate: "2025-01-18 14:35:00",
   },
 ];
+
+export async function fetchParkingLots(): Promise<ParkingLot[]> {
+  try {
+    const response = (await getCenter()) as CenterResponse;
+    const centersList = response?.items || [];
+
+    return centersList.map((center, index) => {
+      const mockInfo = mockParkingLots[index];
+      const address = mockInfo ? mockInfo.address : "Endereço não cadastrado";
+
+      return {
+        id: String(center.operationCenterId),
+        name: center.name,
+        address: address,
+        status: center.isActive ? "connected" : "disconnected",
+        totalGates: 1,
+        connectedGates: 1,
+        lastUpdate: new Date().toISOString().replace("T", " ").substring(0, 19),
+      };
+    });
+  } catch {
+    return mockParkingLots;
+  }
+}
+
+export const parkingList: ParkingLot[] = await fetchParkingLots();
 
 export const mockGates: Record<string, Gate[]> = {
   "1": [
