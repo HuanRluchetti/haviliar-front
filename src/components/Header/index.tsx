@@ -11,7 +11,7 @@ const Header = () => {
                                 <Car className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-semibold">ParkControl</h1>
+                                <h1 className="text-xl font-semibold">Haviliar</h1>
                                 <p className="text-sm text-muted-foreground">Sistema de Controle de Cancelas</p>
                             </div>
                         </div>

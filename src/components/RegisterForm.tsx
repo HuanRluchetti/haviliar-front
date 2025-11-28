@@ -1,4 +1,6 @@
 import React from 'react';
+import { api } from '../services/api'
+import { registerUser } from '@/services/user/register';
 import { useForm } from 'react-hook-form';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -41,8 +43,12 @@ export function RegisterForm({ onRegister, onSwitchToLogin, isLoading = false }:
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, '');
     if (numbers.length <= 10) {
+
+      console.log(numbers.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3'));
+
       return numbers.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
     }
+
     return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
   };
 
@@ -61,7 +67,7 @@ export function RegisterForm({ onRegister, onSwitchToLogin, isLoading = false }:
     setValue('phone', formatted);
   };
 
-  const onSubmit = (data: RegisterData) => {
+  const onSubmit = async (data: RegisterData) => {
     onRegister(data);
   };
 
